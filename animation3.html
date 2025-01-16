@@ -1,10 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Your Firm + Invent Platform -> Your App -> Invent Store -> Another App -> Dashboard</title>
+  <title>Animation 3: Your Firm + Invent Platform -> Your App -> Invent Store -> Another App -> Dashboard</title>
   <style>
+    /* Unifying Styles */
     body {
       margin: 0;
       padding: 0;
@@ -27,7 +27,7 @@
 
 <script>
 /**********************************************************************
- * Animation Steps (0-3):
+ * Animation 3 Steps (0-3):
  *  Step 0: "Your Firm" & "Invent Platform" converge -> "Your App" spawns
  *  Step 1: "Your App" moves to the Invent Store (center box)
  *  Step 2: "Your App" meets "Another App" in the Store
@@ -109,7 +109,15 @@ function drawRoundedRect(x, y, w, h, r, fillColor, borderColor) {
 
 // Draw the Invent Store and label
 function drawInventStore() {
-  drawRoundedRect(inventStore.x, inventStore.y, inventStore.w, inventStore.h, 10, inventStore.color, inventStore.borderColor);
+  drawRoundedRect(
+    inventStore.x, 
+    inventStore.y, 
+    inventStore.w, 
+    inventStore.h, 
+    10, 
+    inventStore.color, 
+    inventStore.borderColor
+  );
   ctx.fillStyle = "#2c3e50";
   ctx.font = "16px Segoe UI";
   ctx.fillText("Invent Store", inventStore.x + 40, inventStore.y - 10);
@@ -117,7 +125,15 @@ function drawInventStore() {
 
 // Draw the Dashboard and label
 function drawDashboard() {
-  drawRoundedRect(dashboard.x, dashboard.y, dashboard.w, dashboard.h, 10, dashboard.color, dashboard.borderColor);
+  drawRoundedRect(
+    dashboard.x, 
+    dashboard.y, 
+    dashboard.w, 
+    dashboard.h, 
+    10, 
+    dashboard.color, 
+    dashboard.borderColor
+  );
   ctx.fillStyle = "#2c3e50";
   ctx.font = "18px Segoe UI";
   ctx.fillText("Dashboard", dashboard.x + 40, dashboard.y - 10);
@@ -129,7 +145,6 @@ function drawDashboard() {
 
 function animateStep0() {
   // Step 0: "Your Firm" & "Invent Platform" converge -> spawn "Your App"
-  // We'll make them move toward a midpoint, then create "Your App" in that spot
   const midX = 120;
   const midY = 250; // midpoint between y=150 and y=350
 
@@ -138,17 +153,15 @@ function animateStep0() {
   // Move "Invent Platform" up toward midY
   inventPlatform.y += (midY - inventPlatform.y) * 0.03;
 
-  // Draw them
   drawCircle(yourFirm);
   drawCircle(inventPlatform);
 
-  // Once they're close to the midpoint, create Your App
+  // Once close, create Your App
   if (
     Math.abs(yourFirm.y - midY) < 1 &&
     Math.abs(inventPlatform.y - midY) < 1
   ) {
-    // Show "Your App" in that spot
-    yourApp.x = midX + 100;   // shift a bit to the right
+    yourApp.x = midX + 100; // shift a bit to the right
     yourApp.y = midY;
     yourApp.radius = 30;
     yourApp.visible = true;
@@ -163,13 +176,11 @@ function animateStep1() {
   drawCircle(inventPlatform);
   drawCircle(yourApp);
 
-  // Move yourApp to center of store
   const targetX = inventStore.x + inventStore.w / 2;
   const targetY = inventStore.y + inventStore.h / 2;
   yourApp.x += (targetX - yourApp.x) * 0.03;
   yourApp.y += (targetY - yourApp.y) * 0.03;
 
-  // If it's close enough, proceed
   if (
     Math.abs(yourApp.x - targetX) < 1 &&
     Math.abs(yourApp.y - targetY) < 1
@@ -184,29 +195,24 @@ function animateStep2() {
   drawCircle(yourFirm);
   drawCircle(inventPlatform);
   drawCircle(yourApp);
-
-  // "Another App" is also in the store area
   drawCircle(anotherApp);
 
-  // We'll nudge "Another App" up into the store, if it's not already near
+  // Nudge Another App to store center
   const storeCenterY = inventStore.y + inventStore.h / 2;
   anotherApp.y += (storeCenterY - anotherApp.y) * 0.03;
 
-  // Then "Your App" merges with "Another App"
-  // We'll move "Your App" towards "Another App"
-  if (frameCount > 60) { // after a short pause
+  // After a short pause, merge
+  if (frameCount > 60) {
     yourApp.x += (anotherApp.x - yourApp.x) * 0.02;
     yourApp.y += (anotherApp.y - yourApp.y) * 0.02;
   }
 
-  // If they're basically overlapping, we unify them
+  // If overlapping, unify them
   if (
     Math.abs(yourApp.x - anotherApp.x) < 2 &&
     Math.abs(yourApp.y - anotherApp.y) < 2
   ) {
-    // We rename "Your App" to "Integrated App"
     yourApp.label = "Integrated App";
-    // Hide "Another App" (or consider it merged)
     anotherApp.visible = false;
     anotherApp.radius = 0;
     step = 3;
@@ -220,7 +226,6 @@ function animateStep3() {
   drawCircle(inventPlatform);
   drawCircle(yourApp);
 
-  // Move integrated app to center of the dashboard
   const targetX = dashboard.x + dashboard.w / 2;
   const targetY = dashboard.y + dashboard.h / 2;
   yourApp.x += (targetX - yourApp.x) * 0.03;
@@ -238,22 +243,17 @@ function animate() {
   drawDashboard();
 
   // Step logic
-  if (step === 0) {
-    animateStep0();
-  } else if (step === 1) {
-    animateStep1();
-  } else if (step === 2) {
-    animateStep2();
-  } else if (step === 3) {
-    animateStep3();
-  }
+  if (step === 0)      animateStep0();
+  else if (step === 1) animateStep1();
+  else if (step === 2) animateStep2();
+  else if (step === 3) animateStep3();
 
   frameCount++;
   requestAnimationFrame(animate);
 }
 
 // Initialize
-yourApp.visible = false;  // hidden until created
+yourApp.visible = false;
 anotherApp.visible = true;
 animate();
 </script>
