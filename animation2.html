@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>App Sources -> Clean Data -> New Application -> Drag to Dashboard</title>
+  <title>Animation 2: App Sources -> Clean Data -> New Application -> Drag to Dashboard</title>
   <style>
+    /* Unifying Styles */
     body {
       margin: 0;
       padding: 0;
-      background: linear-gradient(135deg, #1E3C72 0%, #2A5298 100%);
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
     canvas {
@@ -17,22 +18,29 @@
       border-radius: 8px;
       border: 2px solid #333;
     }
+    /* Additional text color if needed */
+    .info-text {
+      text-align: center;
+      color: #fff;
+      font-size: 18px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
+
+<div class="info-text">Animation 2: Data from multiple sources -> Clean Data -> New App -> Drag to Dashboard</div>
 
 <canvas id="myCanvas" width="900" height="600"></canvas>
 
 <script>
 /*******************************************************
- * Multi-Stage Animation:
- * 1. Apps from multiple sources (circles) move into 
- *    a central "clean data" box.
- * 2. The box transforms into a "New Application" tile.
- * 3. The tile is dragged onto the "Dashboard" on the right.
+ * Multi-Stage Animation (Animation 2):
+ * 1) Apps from multiple sources move into a "clean data" box.
+ * 2) Box transforms into a "New Application" tile.
+ * 3) That tile is dragged onto a "Dashboard" on the right.
  *******************************************************/
 
-// Canvas & Context
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
 
@@ -83,12 +91,6 @@ const dashboard = {
  * Drawing Utilities
  ********************/
 
-/**
- * Draw a rounded rectangle
- * x, y, w, h: position & size
- * r: corner radius
- * fill, stroke: booleans
- */
 function drawRoundedRect(x, y, w, h, r, fill, stroke, fillColor, strokeColor) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
@@ -113,33 +115,11 @@ function drawRoundedRect(x, y, w, h, r, fill, stroke, fillColor, strokeColor) {
   }
 }
 
-/********************
- * Draw Static Items
- ********************/
-
 function drawDashboard() {
-  // Dashboard outline
   drawRoundedRect(dashboard.x, dashboard.y, dashboard.w, dashboard.h, 10, false, true, "", dashboard.borderColor);
-  // Dashboard label
   ctx.fillStyle = "#2c3e50";
   ctx.font = "18px Segoe UI";
   ctx.fillText("Dashboard", dashboard.x + 40, dashboard.y - 10);
-}
-
-/********************
- * Step Animations
- ********************/
-
-function updateDataSources() {
-  dataSources.forEach((ds) => {
-    // Step 0: move to "clean data" box center
-    if (step === 0) {
-      const targetX = cleanDataBox.x + cleanDataBox.w / 2;
-      const targetY = cleanDataBox.y + cleanDataBox.h / 2;
-      ds.x += (targetX - ds.x) * 0.02;
-      ds.y += (targetY - ds.y) * 0.02;
-    }
-  });
 }
 
 function drawDataSources() {
@@ -150,25 +130,17 @@ function drawDataSources() {
     ctx.fill();
     ctx.closePath();
 
-    // Label
     ctx.fillStyle = "#2c3e50";
     ctx.font = "14px Segoe UI";
     ctx.textAlign = "center";
-    ctx.fillText(ds.name, ds.x, ds.y - 30);
+    ctx.fillText(ds.name, ds.x, ds.y - 25);
   });
 }
 
-// Draw "Clean Data" box
 function drawCleanDataBox() {
   drawRoundedRect(
-    cleanDataBox.x, 
-    cleanDataBox.y, 
-    cleanDataBox.w, 
-    cleanDataBox.h, 
-    cleanDataBox.cornerRadius, 
-    true, true,
-    cleanDataBox.fillColor,
-    cleanDataBox.strokeColor
+    cleanDataBox.x, cleanDataBox.y, cleanDataBox.w, cleanDataBox.h,
+    cleanDataBox.cornerRadius, true, true, cleanDataBox.fillColor, cleanDataBox.strokeColor
   );
   ctx.fillStyle = "#2c3e50";
   ctx.font = "16px Segoe UI";
@@ -176,17 +148,10 @@ function drawCleanDataBox() {
   ctx.fillText("Clean Data", cleanDataBox.x + cleanDataBox.w / 2, cleanDataBox.y + cleanDataBox.h / 2 + 5);
 }
 
-// Draw "New Application" tile
 function drawNewApplication() {
   drawRoundedRect(
-    newAppTile.x, 
-    newAppTile.y, 
-    newAppTile.w, 
-    newAppTile.h, 
-    newAppTile.cornerRadius, 
-    true, true,
-    newAppTile.fillColor,
-    newAppTile.strokeColor
+    newAppTile.x, newAppTile.y, newAppTile.w, newAppTile.h,
+    newAppTile.cornerRadius, true, true, newAppTile.fillColor, newAppTile.strokeColor
   );
   ctx.fillStyle = "#fff";
   ctx.font = "16px Segoe UI";
@@ -195,72 +160,73 @@ function drawNewApplication() {
 }
 
 /********************
+ * Step Animations
+ ********************/
+
+function updateDataSources() {
+  dataSources.forEach((ds) => {
+    if (step === 0) {
+      const targetX = cleanDataBox.x + cleanDataBox.w / 2;
+      const targetY = cleanDataBox.y + cleanDataBox.h / 2;
+      ds.x += (targetX - ds.x) * 0.02;
+      ds.y += (targetY - ds.y) * 0.02;
+    }
+  });
+}
+
+/********************
  * Main Animation Loop
  ********************/
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw static items: dashboard
+  // Draw static items
   drawDashboard();
 
-  // Step 0: Sources move into "clean data" box
-  // Step 1: Switch from "clean data" to "New Application"
-  // Step 2: Drag "New Application" to the dashboard
+  // Step 0: data sources -> Clean Data box
+  // Step 1: transform box -> "New Application"
+  // Step 2: "New Application" -> Dashboard
 
-  // 1) Step 0 logic
   if (step === 0) {
-    drawCleanDataBox();   // Box is visible
+    drawCleanDataBox();
     updateDataSources();
     drawDataSources();
 
-    // After a certain time, move to next step
-    if (frameCount > 180) { // about 3s at ~60fps
+    if (frameCount > 180) { // 3s
       step = 1;
-      frameCount = 0; 
-      // Set all DS positions to the box center
+      frameCount = 0;
+      // Place data sources in the box center
       dataSources.forEach(ds => {
         ds.x = cleanDataBox.x + cleanDataBox.w / 2;
         ds.y = cleanDataBox.y + cleanDataBox.h / 2;
       });
     }
   }
-
-  // 2) Step 1: show "New Application" tile (replacing the box)
   else if (step === 1) {
-    // Draw the data box in a "hidden" style or skip it
-    // to visually show transformation to "New Application"
-    // We'll just skip drawing the box.
-
-    // Immediately draw the New Application tile in the same location
+    // Immediately show the "New App" tile in place of the box
     drawNewApplication();
-    drawDataSources(); // data circles remain inside or no longer visible
-    
-    // After a short pause, move tile to Step 2
-    if (frameCount > 120) { // about 2s
+    drawDataSources(); // if you want them inside or vanish
+
+    if (frameCount > 120) { // ~2s
       step = 2;
       frameCount = 0;
     }
   }
-
-  // 3) Step 2: animate dragging the tile to the dashboard
   else if (step === 2) {
-    // Move the tile's x,y toward the center of the dashboard
+    // Move the tile to the dashboard
     const targetX = dashboard.x + (dashboard.w / 2) - (newAppTile.w / 2);
     const targetY = dashboard.y + (dashboard.h / 2) - (newAppTile.h / 2);
     newAppTile.x += (targetX - newAppTile.x) * 0.04;
     newAppTile.y += (targetY - newAppTile.y) * 0.04;
 
-    // Draw the new application tile
     drawNewApplication();
-
-    // Once it arrives, you could do a final step or simply hold it
   }
 
   frameCount++;
   requestAnimationFrame(animate);
 }
 
-// Start the animation
+// Start
 animate();
 </script>
 
