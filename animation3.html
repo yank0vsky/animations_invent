@@ -1,0 +1,262 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Your Firm + Invent Platform -> Your App -> Invent Store -> Another App -> Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: #ffffff;
+    }
+    canvas {
+      display: block;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      border: 2px solid #333;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="myCanvas" width="900" height="600"></canvas>
+
+<script>
+/**********************************************************************
+ * Animation Steps (0-3):
+ *  Step 0: "Your Firm" & "Invent Platform" converge -> "Your App" spawns
+ *  Step 1: "Your App" moves to the Invent Store (center box)
+ *  Step 2: "Your App" meets "Another App" in the Store
+ *  Step 3: The integrated/combined app moves to the Dashboard (right)
+ **********************************************************************/
+
+const canvas = document.getElementById('myCanvas');
+const ctx = canvas.getContext('2d');
+
+// Step tracking
+let step = 0;
+let frameCount = 0;
+
+// Entities & positions
+const yourFirm = {
+  x: 120, y: 150, radius: 40, color: "#F08A5D", label: "Your Firm"
+};
+const inventPlatform = {
+  x: 120, y: 350, radius: 40, color: "#B83B5E", label: "Invent Platform"
+};
+const yourApp = {
+  x: 0, y: 0, radius: 0, color: "#3498db", label: "Your App", visible: false
+};
+const anotherApp = {
+  x: 480, y: 340, radius: 30, color: "#2ecc71", label: "Another App"
+};
+
+// Invent Store box
+const inventStore = {
+  x: 400, y: 200, w: 200, h: 120, color: "#ecf0f1", borderColor: "#2c3e50"
+};
+
+// Dashboard on the right
+const dashboard = {
+  x: 700, y: 100, w: 180, h: 400, color: "#ffffff", borderColor: "#34495e"
+};
+
+/*****************
+ * Draw Utilities
+ *****************/
+
+// Draw a circle with label
+function drawCircle(obj) {
+  if (!obj.visible && obj.radius === 0) return;  // if hidden or uninitialized
+
+  ctx.beginPath();
+  ctx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
+  ctx.fillStyle = obj.color;
+  ctx.fill();
+  ctx.closePath();
+
+  // Label above circle
+  ctx.fillStyle = "#2c3e50";
+  ctx.font = "14px Segoe UI";
+  ctx.textAlign = "center";
+  ctx.fillText(obj.label, obj.x, obj.y - obj.radius - 10);
+}
+
+// Draw a rounded rectangle
+function drawRoundedRect(x, y, w, h, r, fillColor, borderColor) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+
+  ctx.fillStyle = fillColor;
+  ctx.fill();
+  ctx.strokeStyle = borderColor;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+// Draw the Invent Store and label
+function drawInventStore() {
+  drawRoundedRect(inventStore.x, inventStore.y, inventStore.w, inventStore.h, 10, inventStore.color, inventStore.borderColor);
+  ctx.fillStyle = "#2c3e50";
+  ctx.font = "16px Segoe UI";
+  ctx.fillText("Invent Store", inventStore.x + 40, inventStore.y - 10);
+}
+
+// Draw the Dashboard and label
+function drawDashboard() {
+  drawRoundedRect(dashboard.x, dashboard.y, dashboard.w, dashboard.h, 10, dashboard.color, dashboard.borderColor);
+  ctx.fillStyle = "#2c3e50";
+  ctx.font = "18px Segoe UI";
+  ctx.fillText("Dashboard", dashboard.x + 40, dashboard.y - 10);
+}
+
+/*********************
+ * Step-by-Step Logic
+ *********************/
+
+function animateStep0() {
+  // Step 0: "Your Firm" & "Invent Platform" converge -> spawn "Your App"
+  // We'll make them move toward a midpoint, then create "Your App" in that spot
+  const midX = 120;
+  const midY = 250; // midpoint between y=150 and y=350
+
+  // Move "Your Firm" down toward midY
+  yourFirm.y += (midY - yourFirm.y) * 0.03;
+  // Move "Invent Platform" up toward midY
+  inventPlatform.y += (midY - inventPlatform.y) * 0.03;
+
+  // Draw them
+  drawCircle(yourFirm);
+  drawCircle(inventPlatform);
+
+  // Once they're close to the midpoint, create Your App
+  if (
+    Math.abs(yourFirm.y - midY) < 1 &&
+    Math.abs(inventPlatform.y - midY) < 1
+  ) {
+    // Show "Your App" in that spot
+    yourApp.x = midX + 100;   // shift a bit to the right
+    yourApp.y = midY;
+    yourApp.radius = 30;
+    yourApp.visible = true;
+    step = 1;
+    frameCount = 0;
+  }
+}
+
+function animateStep1() {
+  // Step 1: "Your App" moves to the Invent Store
+  drawCircle(yourFirm);
+  drawCircle(inventPlatform);
+  drawCircle(yourApp);
+
+  // Move yourApp to center of store
+  const targetX = inventStore.x + inventStore.w / 2;
+  const targetY = inventStore.y + inventStore.h / 2;
+  yourApp.x += (targetX - yourApp.x) * 0.03;
+  yourApp.y += (targetY - yourApp.y) * 0.03;
+
+  // If it's close enough, proceed
+  if (
+    Math.abs(yourApp.x - targetX) < 1 &&
+    Math.abs(yourApp.y - targetY) < 1
+  ) {
+    step = 2;
+    frameCount = 0;
+  }
+}
+
+function animateStep2() {
+  // Step 2: "Your App" meets "Another App" in the Invent Store
+  drawCircle(yourFirm);
+  drawCircle(inventPlatform);
+  drawCircle(yourApp);
+
+  // "Another App" is also in the store area
+  drawCircle(anotherApp);
+
+  // We'll nudge "Another App" up into the store, if it's not already near
+  const storeCenterY = inventStore.y + inventStore.h / 2;
+  anotherApp.y += (storeCenterY - anotherApp.y) * 0.03;
+
+  // Then "Your App" merges with "Another App"
+  // We'll move "Your App" towards "Another App"
+  if (frameCount > 60) { // after a short pause
+    yourApp.x += (anotherApp.x - yourApp.x) * 0.02;
+    yourApp.y += (anotherApp.y - yourApp.y) * 0.02;
+  }
+
+  // If they're basically overlapping, we unify them
+  if (
+    Math.abs(yourApp.x - anotherApp.x) < 2 &&
+    Math.abs(yourApp.y - anotherApp.y) < 2
+  ) {
+    // We rename "Your App" to "Integrated App"
+    yourApp.label = "Integrated App";
+    // Hide "Another App" (or consider it merged)
+    anotherApp.visible = false;
+    anotherApp.radius = 0;
+    step = 3;
+    frameCount = 0;
+  }
+}
+
+function animateStep3() {
+  // Step 3: The integrated app goes to the Dashboard
+  drawCircle(yourFirm);
+  drawCircle(inventPlatform);
+  drawCircle(yourApp);
+
+  // Move integrated app to center of the dashboard
+  const targetX = dashboard.x + dashboard.w / 2;
+  const targetY = dashboard.y + dashboard.h / 2;
+  yourApp.x += (targetX - yourApp.x) * 0.03;
+  yourApp.y += (targetY - yourApp.y) * 0.03;
+}
+
+/***********************
+ * Main Animation Loop
+ ***********************/
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw static areas
+  drawInventStore();
+  drawDashboard();
+
+  // Step logic
+  if (step === 0) {
+    animateStep0();
+  } else if (step === 1) {
+    animateStep1();
+  } else if (step === 2) {
+    animateStep2();
+  } else if (step === 3) {
+    animateStep3();
+  }
+
+  frameCount++;
+  requestAnimationFrame(animate);
+}
+
+// Initialize
+yourApp.visible = false;  // hidden until created
+anotherApp.visible = true;
+animate();
+</script>
+
+</body>
+</html>
