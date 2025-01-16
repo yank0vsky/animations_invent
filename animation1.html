@@ -2,66 +2,73 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Data Flow Animation</title>
+  <title>Animation 1: Data Flow Simulation</title>
   <style>
+    /* Unifying Styles */
     body {
       margin: 0;
       padding: 0;
-      background: #f4f4f4;
-      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: #ffffff;
     }
     canvas {
       display: block;
-      margin: 0 auto;
+      margin: 40px auto;
       background: #ffffff;
+      border-radius: 8px;
       border: 2px solid #333;
+    }
+    .info-text {
+      text-align: center;
+      color: #fff;
+      font-size: 18px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-<canvas id="myCanvas" width="800" height="500"></canvas>
+
+<div class="info-text">Animation 1: Data sources flow into storage, then sync to a chart</div>
+<canvas id="myCanvas" width="900" height="600"></canvas>
 
 <script>
 /************************************************
- * Data Flow Simulation
- * Shows multiple data sources (custodians, PMS)
- * flowing into a central "storage" area, then
- * syncing and displaying on a final chart.
+ * Animation 1: Data Flow Simulation
+ * Multiple data sources -> Storage -> Sync -> Chart
  ************************************************/
 
-// Grab the canvas and context
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 
-// Data source objects with initial positions
+// Data source objects
 const dataSources = [
-  { name: "Orion", x: 50,  y: 50,  color: "#ff6f69" },
-  { name: "Addepar", x: 50,  y: 150, color: "#ffcc5c" },
-  { name: "Tamarac", x: 50,  y: 250, color: "#88d8b0" },
-  { name: "eMoney", x: 50,  y: 350, color: "#96ceb4" },
+  { name: "Orion",   x: 50,  y: 70,  color: "#ff6f69" },
+  { name: "Addepar", x: 50,  y: 190, color: "#ffcc5c" },
+  { name: "Tamarac", x: 50,  y: 310, color: "#88d8b0" },
+  { name: "eMoney",  x: 50,  y: 430, color: "#96ceb4" },
 ];
 
-// Storage box coordinates
+// Storage box
 const storageBox = {
-  x: 300,  // top-left corner of the box
-  y: 200,
+  x: 320,
+  y: 220,
   w: 200,
   h: 100
 };
 
-// Chart area coordinates on the right side
+// Chart area
 const chartArea = {
-  x: 600,
-  y: 100,
-  w: 150,
+  x: 650,
+  y: 130,
+  w: 180,
   h: 300
 };
 
-// Animation state
 let step = 0;
 let frameCount = 0;
 
-// Bar chart data once the circles reach the storage
+// Bar chart data
 const chartBars = [
   { label: "Client A", value: 0, target: 100 },
   { label: "Client B", value: 0, target: 150 },
@@ -69,92 +76,77 @@ const chartBars = [
   { label: "Client D", value: 0, target: 120 },
 ];
 
-// Draw the storage box
+// Draw storage box
 function drawStorageBox() {
-  ctx.fillStyle = "#ddd";
+  ctx.fillStyle = "#ecf0f1";
   ctx.fillRect(storageBox.x, storageBox.y, storageBox.w, storageBox.h);
-  ctx.strokeStyle = "#666";
+  ctx.strokeStyle = "#2c3e50";
   ctx.lineWidth = 2;
   ctx.strokeRect(storageBox.x, storageBox.y, storageBox.w, storageBox.h);
 
-  ctx.fillStyle = "#333";
-  ctx.font = "16px Arial";
-  ctx.fillText("Client & Account Data Storage", storageBox.x + 10, storageBox.y + 55);
+  ctx.fillStyle = "#2c3e50";
+  ctx.font = "16px Segoe UI";
+  ctx.fillText("Data Storage", storageBox.x + 40, storageBox.y + 55);
 }
 
-// Draw the chart area outline
+// Draw chart area
 function drawChartArea() {
-  ctx.strokeStyle = "#666";
+  ctx.strokeStyle = "#2c3e50";
   ctx.lineWidth = 2;
   ctx.strokeRect(chartArea.x, chartArea.y, chartArea.w, chartArea.h);
 
-  ctx.fillStyle = "#333";
-  ctx.font = "16px Arial";
-  ctx.fillText("Chart", chartArea.x + 40, chartArea.y - 10);
+  ctx.fillStyle = "#2c3e50";
+  ctx.font = "16px Segoe UI";
+  ctx.fillText("Chart", chartArea.x + 50, chartArea.y - 10);
 }
 
-// Draw the bar chart
+// Draw chart bars
 function drawChartBars() {
-  // We have chartBars with { label, value, target }
   const barWidth = 20;
   const gap = 15;
   let startY = chartArea.y + 20;
 
   for (let i = 0; i < chartBars.length; i++) {
     const bar = chartBars[i];
-    // Update value to move toward target
+    // Grow bar value
     if (bar.value < bar.target) {
-      bar.value += 2; // speed of bar growth
+      bar.value += 2;
       if (bar.value > bar.target) bar.value = bar.target;
     }
 
     // Draw bar
-    ctx.fillStyle = "#3399ff";
-    // bar height is bar.value
+    ctx.fillStyle = "#3498db";
     ctx.fillRect(chartArea.x + 30, startY, bar.value, barWidth);
 
-    // Label
-    ctx.fillStyle = "#333";
-    ctx.font = "14px Arial";
-    ctx.fillText(bar.label, chartArea.x + 30 + bar.value + 10, startY + 15);
+    // Bar label
+    ctx.fillStyle = "#2c3e50";
+    ctx.font = "14px Segoe UI";
+    ctx.fillText(bar.label, chartArea.x + 35 + bar.value, startY + 15);
 
     startY += barWidth + gap;
   }
 }
 
-// Update each data source position
+// Move data sources
 function updateDataSources() {
   dataSources.forEach((ds) => {
-    // Move to storage
     if (step === 0) {
+      // Move to storage
       const targetX = storageBox.x + storageBox.w / 2;
       const targetY = storageBox.y + storageBox.h / 2;
       ds.x += (targetX - ds.x) * 0.02;
       ds.y += (targetY - ds.y) * 0.02;
-
-      // If close enough to the storage center, switch step
-      if (Math.abs(ds.x - targetX) < 1 && Math.abs(ds.y - targetY) < 1) {
-        ds.x = targetX;
-        ds.y = targetY;
-      }
-    }
-    // Move to chart area
-    else if (step === 1) {
+    } else if (step === 1) {
+      // Move to chart
       const targetX = chartArea.x + chartArea.w / 2;
       const targetY = chartArea.y + chartArea.h / 2;
       ds.x += (targetX - ds.x) * 0.02;
       ds.y += (targetY - ds.y) * 0.02;
-
-      // If close enough to the chart center, we might do final arrangement
-      if (Math.abs(ds.x - targetX) < 1 && Math.abs(ds.y - targetY) < 1) {
-        ds.x = targetX;
-        ds.y = targetY;
-      }
     }
   });
 }
 
-// Draw each data source circle
+// Draw data source circles
 function drawDataSources() {
   dataSources.forEach((ds) => {
     ctx.beginPath();
@@ -164,35 +156,31 @@ function drawDataSources() {
     ctx.closePath();
 
     // Label
-    ctx.fillStyle = "#000";
-    ctx.font = "12px Arial";
+    ctx.fillStyle = "#2c3e50";
+    ctx.font = "12px Segoe UI";
     ctx.fillText(ds.name, ds.x - 20, ds.y - 25);
   });
 }
 
-// Main animation loop
+// Main loop
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw static elements
+  // Draw static
   drawStorageBox();
   drawChartArea();
 
-  // Step transitions
   if (step === 0 && frameCount > 200) {
-    // After some frames, move to next step
     step = 1;
   }
   if (step === 1 && frameCount > 400) {
-    // Once data is in chart area, start drawing chart bars
     drawChartBars();
   }
 
-  // Update & draw data sources
   updateDataSources();
   drawDataSources();
 
-  // If step >= 1, animate chart bars growth
+  // If step >= 1, show bars
   if (step >= 1 && frameCount > 400) {
     drawChartBars();
   }
@@ -201,7 +189,7 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-// Start animation
+// Start
 animate();
 </script>
 </body>
